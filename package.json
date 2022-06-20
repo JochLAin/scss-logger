@@ -1,0 +1,34 @@
+{
+  "name": "@jochlain/scss-logger",
+  "version": "1.0.0",
+  "description": "A logger for SCSS development",
+  "main": "index.scss",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JochLAin/scss-logger.git"
+  },
+  "keywords": [
+    "scss",
+    "logger",
+    "error",
+    "debug",
+    "log",
+    "critical",
+    "warn",
+    "console",
+    "message"
+  ],
+  "author": "Jocelyn Faihy <jocelyn@faihy.fr>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JochLAin/scss-logger/issues"
+  },
+  "homepage": "https://github.com/JochLAin/scss-logger#readme",
+  "devDependencies": {
+    "jest": "^27.5.1",
+    "sass": "^1.49.9"
+  }
+}

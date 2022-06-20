@@ -1,0 +1,36 @@
+@use "../index" as logger;
+// Because of SCSS function cannot be called without a return value it need a declaration
+
+$t: logger.notice('Notice message'); // Do nothing because notice is less important than debug
+$t: logger.debug('Debug message'); // Show message
+$t: logger.warn('Warning message'); // Show message and stacktrace
+//$t: logger.error('Error message'); // Throw exception
+//$t: logger.critical('Critical message'); // Throw exception
+
+// Set the log level to notice
+$t: logger.set-log-level(notice);
+$t: logger.notice('Notice message after change configuration'); // Show message
+
+// Set the log level to warn
+$t: logger.set-log-level(warn);
+$t: logger.debug('Debug message'); // Do nothing
+$t: logger.warn('Warning message'); // Show message and trace
+
+// Disable feature
+$t: logger.disable();
+$t: logger.critical('Disabled critical message'); // Do nothing
+
+// Enable feature and set null level on all
+$t: logger.enable();
+$t: logger.configure-levels(null, null, null);
+$t: logger.critical('Quiet critical message'); // Do nothing
+
+// Reset feature
+$t: logger.configure-levels(error, warn, debug);
+$t: logger.notice('Quiet notice message'); // Do nothing
+
+// Set the thrown exception level to critical
+$t: logger.set-throw-level(critical);
+$t: logger.error('Error message'); // Show message and trace but not throw exception
+
+$t: logger.critical('Critical message');

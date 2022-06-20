@@ -1,0 +1,171 @@
+@use "sass:list";
+@use "sass:map";
+
+// Allow endpoint developer to disable feature
+$enabled: true !default;
+
+// Permits add level if boolean or global prefix
+$options: () !default;
+$options: map.merge((
+  // Levels ordered by importance level decrease
+  levels: null critical error warn info debug notice,
+  // The level at which a message is displayed
+  log-level: debug,
+  // The level at which stacktrace is displayed
+  trace-level: warn,
+  // The level at which a message is thrown
+  throw-level: error,
+  // If string prefix or true if level
+  prefix: null,
+), $options);
+
+@function create(
+  $levels: map.get($options, levels),
+  $log-level: map.get($options, log-level),
+  $trace-level: map.get($options, trace-level),
+  $throw-level: map.get($options, throw-level),
+  $prefix: map.get($options, prefix)
+) {
+  @return (
+    levels: $levels,
+    log-level: $log-level,
+    trace-level: $trace-level,
+    throw-level: $throw-level,
+    prefix: $prefix,
+  )
+}
+
+@function notice($messages, $logger: ()) {
+  @return log(notice, $messages, $logger);
+}
+
+@function debug($messages, $logger: ()) {
+  @return log(debug, $messages, $logger);
+}
+
+@function info($messages, $logger: ()) {
+  @return log(info, $messages, $logger);
+}
+
+@function warn($messages, $logger: ()) {
+  @return log(warn, $messages, $logger);
+}
+
+@function error($messages, $logger: ()) {
+  @return log(error, $messages, $logger);
+}
+
+@function critical($messages, $logger: ()) {
+  @return log(critical, $messages, $logger);
+}
+
+@function log($level, $messages, $logger: ()) {
+  $logger: map.merge($options, $logger);
+  @if $enabled {
+    $levels: map.get($logger, levels);
+    $prefix: map.get($logger, prefix);
+    $prefix: if($prefix == null, '', if(type-of($prefix) == 'string', $prefix, if($prefix, "#{$level}: ", "")));
+    $messages: "#{$prefix}#{$messages}";
+    $idx: list.index($levels, $level);
+
+    @if $idx <= list.index($levels, map.get($logger, throw-level)) {
+      // Display message and stacktrace and stop process
+      @error "#{$level}: #{$messages}";
+    }
+    @else if $idx <= list.index($levels, map.get($logger, trace-level)) {
+      // Display message and stacktrace
+      @warn "#{$level}: #{$messages}";
+    }
+    @else if $idx <= list.index($levels, map.get($logger, log-level)) {
+      // Display message
+      @debug "#{$level}: #{$messages}";
+    }
+  }
+  // As javascript console return a falsy value, like false
+  @return false;
+}
+
+// Function to help configure top level variables
+@function disable() {
+  $enabled: false !global;
+  @return true;
+}
+
+@function enable() {
+  $enabled: true !global;
+  @return true;
+}
+
+@function configure($opts: (), $logger: null) {
+  @if null == $logger {
+    $options: map.merge($options, $opts) !global;
+    @return $options;
+  }
+  $logger: map.merge($logger, $opts);
+  @return $logger;
+}
+
+@function configure-levels(
+  $throw-level: map.get($options, throw-level),
+  $trace-level: map.get($options, trace-level),
+  $log-level: map.get($options, log-level),
+  $logger: null
+) {
+  $opts: (
+    throw-level: $throw-level,
+    trace-level: $trace-level,
+    log-level: $log-level,
+  );
+
+  @if null == $logger {
+    $options: map.merge($options, $opts) !global;
+    @return $options;
+  }
+  $logger: map.merge($logger, $opts);
+  @return $logger;
+}
+
+@function set-levels($levels, $logger: null) {
+  @if null == $logger {
+    $options: map.set($options, levels, $levels) !global;
+    @return $options;
+  }
+  $logger: map.set($logger, levels, $levels);
+  @return $logger;
+}
+
+@function set-throw-level($level, $logger: null) {
+  @if null == $logger {
+    $options: map.set($options, throw-level, $level) !global;
+    @return $options;
+  }
+  $logger: map.set($logger, throw-level, $level);
+  @return $logger;
+}
+
+@function set-trace-level($level, $logger: null) {
+  @if null == $logger {
+    $options: map.set($options, trace-level, $level) !global;
+    @return $options;
+  }
+  $logger: map.set($logger, trace-level, $level);
+  @return $logger;
+}
+
+@function set-log-level($level, $logger: null) {
+  @if null == $logger {
+    $options: map.set($options, log-level, $level) !global;
+    @return $options;
+  }
+  $logger: map.set($logger, log-level, $level);
+  @return $logger;
+}
+
+@function set-prefix($prefix, $logger: null) {
+  @if null == $logger {
+    $options: map.set($options, prefix, $prefix) !global;
+    @return $options;
+  }
+  $logger: map.set($logger, prefix, $prefix);
+  @return $logger;
+}
